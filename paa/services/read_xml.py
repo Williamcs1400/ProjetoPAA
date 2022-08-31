@@ -6,6 +6,7 @@ URL = 'https://g1.globo.com/rss/g1/' # URL do feed
 INTERVAL = 60                        # tempo de intervalo entre as chamadas leituras do feed
 
 def read_news():
+    print('Lendo notícias...')
     threading.Timer(INTERVAL, read_news).start()
 
     NewsFeed = feedparser.parse(URL)
