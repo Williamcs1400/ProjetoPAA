@@ -6,22 +6,17 @@
         <link rel="stylesheet" type="text/css" href="../static/login.css" media="screen">
     </head>
     <body>
-        <div class="login-page">
-            <div class="form">
-              <form class="register-form">
-                <input type="text" placeholder="Nome"/>
-                <input type="password" placeholder="Senha"/>
-                <input type="text" placeholder="Usuário"/>
-                <button style="text-transform: none;">Criar</button>
-                <p class="message">Já está registrado? <a href="#">Login</a></p>
-              </form>
-              <form class="login-form" action="/login/" method="post">
-                <input type="text" placeholder="Usuário"/>
-                <input type="password" placeholder="Senha"/>
-                <button style="text-transform: none;" type="submit">Login</button>
-                <p class="message">Não possui uma conta? <a href="#">Criar um nova conta</a></p>
-              </form>
-            </div>
-          </div>
+      <div class="login-page">
+        <div class="form">
+          <form class="login-form" action="/login" method="post">
+            <input type="text" placeholder="Usuário"/>
+            <input type="password" placeholder="Senha"/>
+            <button style="text-transform: none;" type="submit">Login</button>
+            <form>
+              <p class="message">Não possui uma conta? <a href="/to_register">Criar um nova conta</a></p>
+            </form>
+          </form>
+        </div>
+      </div>
     </body>
 </html>
