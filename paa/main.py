@@ -13,7 +13,7 @@ def main():
     read_xml.read_news()
     return render_template('login.html')
 
-@app.route("/login/", methods=['POST'])
+@app.route("/login", methods=['POST'])
 def move_forward():
     # db.insert_user('username', 'password')
     return render_template('index.html')

@@ -1,4 +1,5 @@
 import sqlite3
+import services.dictionary as dictionary
 
 conn = sqlite3.connect('database/feed.db', check_same_thread=False)
 cursor = conn.cursor()
@@ -69,6 +70,21 @@ def insert_news(title, content):
         cursor.execute("""INSERT INTO news (title, content) VALUES (?, ?);""", (title, content))
         conn.commit()
         print("Notícia inserida com sucesso!")
+
+        # salvar tags
+        cursor.execute("""SELECT id FROM news WHERE title = ?;""", (title,))
+        news_id = cursor.fetchone()[0]
+        filtred = dictionary.suit_text(title + " " + content)
+        array_word_occurrence = dictionary.word_count(filtred[0])
+        insert_tags(news_id, array_word_occurrence)
+        
+
+def insert_tags(news_id, tags):
+    for tag in tags:
+        cursor.execute("""SELECT id FROM tags WHERE news_id = ? AND tag = ?;""", (news_id, tag))
+        if cursor.fetchone() is None:
+            cursor.execute("""INSERT INTO tags (news_id, tag) VALUES (?, ?);""", (news_id, tag))
+            conn.commit()
 
 def insert_user(username, password):
     cursor.execute("""SELECT id FROM users WHERE username = ?;""", (username,))
