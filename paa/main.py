@@ -13,11 +13,9 @@ def main():
     read_xml.read_news()
     return render_template('login.html')
 
-@app.route("/login", methods=['POST'])
+@app.route("/login/", methods=['POST'])
 def move_forward():
-    
-    print('LOGIN........................')
-    forward_message = "Moving Forward..."
-    return render_template('index.html', forward_message=forward_message);
+    # db.insert_user('username', 'password')
+    return render_template('index.html')
 
 app.run(debug=True) # tirar o debug=True quando for apresentar

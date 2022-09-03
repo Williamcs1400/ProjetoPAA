@@ -12,8 +12,7 @@ def create_tables():
             CREATE TABLE users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT,
-                password TEXT,
-                preferences TEXT
+                password TEXT
             );
         """)
         print("Tabela de usuários criada com sucesso!")
@@ -26,8 +25,7 @@ def create_tables():
             CREATE TABLE preferences (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER,
-                category TEXT,
-                value TEXT
+                category TEXT
             );
         """)
         print("Tabela de preferências criada com sucesso!")
@@ -52,7 +50,8 @@ def create_tables():
         cursor.execute("""
             CREATE TABLE tags (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT
+                news_id INTEGER,
+                tag TEXT
             );
         """)
         print("Tabela de tags criada com sucesso!")
@@ -70,3 +69,19 @@ def insert_news(title, content):
         cursor.execute("""INSERT INTO news (title, content) VALUES (?, ?);""", (title, content))
         conn.commit()
         print("Notícia inserida com sucesso!")
+
+def insert_user(username, password):
+    cursor.execute("""SELECT id FROM users WHERE username = ?;""", (username,))
+    if cursor.fetchone() is None:
+        print('Inserindo usuário de nome {}'.format(username))
+        cursor.execute("""INSERT INTO users (username, password) VALUES (?, ?);""", (username, password))
+        conn.commit()
+        print("Usuário inserido com sucesso!")
+
+        cursor.execute("""SELECT id FROM users WHERE username = ?;""", (username,))
+        user_id = cursor.fetchone()[0]
+        return (True, user_id)
+
+    else:
+        print("Usuário já existe!")
+        return (False, "")
