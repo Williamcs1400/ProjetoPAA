@@ -23,8 +23,10 @@ def main():
 @app.route('/register', methods=['POST'])
 def register():
     name =  request.form['name_register']
-    username = request.form['password_register']
-    password = request.form['username_register']
+    username = request.form['username_register']
+    password = request.form['password_register']
+
+    db.insert_user(username, password)
 
     print('name: ', name)
     print('username: ', username)
@@ -35,7 +37,15 @@ def register():
 @app.route('/login', methods=['POST'])
 def login():
     # fazer login
-    return render_template('index.html')
+    username = request.form['username_login']
+    password = request.form['password_login']
+
+    result = db.compare_user(username,password)
+
+    if result == True:
+        return render_template('index.html')
+    else:
+        return render_template('login.html')
 
 @app.route("/to_register")
 def to_register():

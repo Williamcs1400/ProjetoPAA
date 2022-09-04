@@ -101,3 +101,14 @@ def insert_user(username, password):
     else:
         print("Usuário já existe!")
         return (False, "")
+
+def compare_user(username, password):
+
+    cursor.execute("""SELECT id FROM users WHERE username = ? AND password = ?;""", (username, password))
+    if cursor.fetchone() is None:
+        print("Usuario ou Senha incorreta")
+        return (False)
+
+    else:
+        print("Login efetuado com sucesso")
+        return (True)

@@ -31,6 +31,10 @@ def remove_numbers(text):
 def remove_punctuation(text):
     return text.translate(str.maketrans('', '', punctuation))
 
+def remove_img(text):
+    # as noticias sempre vem com a tag img, então vamos remover
+    text = text.replace('<img src="', '')
+
 def suit_text(text):
     text = remove_numbers(text)
     text = remove_punctuation(text)
