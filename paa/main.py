@@ -3,10 +3,10 @@ from flask import Flask, render_template, request
 import database.database_operations as db
 import services.read_xml as read_xml
 
-
 app = Flask(__name__)
 
 db_connection = None
+current_user = None
 
 # opreacoes iniciais do app
 def init_app():
@@ -19,6 +19,13 @@ def init_app():
 @app.route('/')
 def main():
     return render_template('login.html')
+
+@app.route('/click_news', methods=['POST'])
+def click_news():
+    title = request.values.get('title')
+    
+    db.insert_preference(current_user, title)
+    return render_template('news.html', data=read_xml.get_last_news())
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -42,8 +49,10 @@ def login():
 
     result = db.compare_user(username,password)
 
-    if result == True:
-        return render_template('index.html')
+    if result[0] == True:
+        current_user = result[1]
+        print('current_user: ', current_user)
+        return render_template('news.html', data=read_xml.get_last_news())
     else:
         return render_template('login.html')
 

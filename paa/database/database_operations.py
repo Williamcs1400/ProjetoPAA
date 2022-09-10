@@ -26,7 +26,7 @@ def create_tables():
             CREATE TABLE preferences (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER,
-                category TEXT
+                news_id INTEGER
             );
         """)
         print("Tabela de preferências criada com sucesso!")
@@ -105,10 +105,18 @@ def insert_user(username, password):
 def compare_user(username, password):
 
     cursor.execute("""SELECT id FROM users WHERE username = ? AND password = ?;""", (username, password))
-    if cursor.fetchone() is None:
-        print("Usuario ou Senha incorreta")
-        return (False)
+    result = cursor.fetchone()
+    if result is None:
 
+        return (False, -1)
     else:
-        print("Login efetuado com sucesso")
-        return (True)
+        return (True, str(result[0]))
+
+def insert_preference(user_id, title):
+    cursor.execute("""SELECT id FROM news WHERE title = ?;""", (title,))
+    news_id = cursor.fetchone()[0]
+    
+    print('Inserindo preferência de usuário {} para notícia {}'.format(user_id, news_id))
+    cursor.execute("""INSERT INTO preferences (user_id, news_id) VALUES (?, ?);""", (user_id, news_id))
+    conn.commit()
+    print("Preferência inserida com sucesso!")

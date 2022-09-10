@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Notícias</title>
+        <link rel="stylesheet" type="text/css" href="../static/news.css" media="screen">
+        <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
+<!-- <script src="path-para-seu-script"></script> -->
+    </head>
+    <body>
+      <div class="login-page">
+        <div class="form">
+            <h1>Guia de notícias</h1>
+            <ul>
+            {% for item in data %}
+            <a target="_blank" rel="noopener noreferrer" href={{item.link}}>
+                <h3 class="title_news" onclick="click_new('{{item.title}}')">{{item.title}}</h3>
+            </a>
+            {% endfor %}
+            </ul>  
+            <script>
+                function click_new(message) {
+                    $.ajax({
+                        url: '/click_news',
+                        type: 'POST',
+                        data: {title: message},
+                        success: function(data) {
+                            
+                        }
+                    });
+                }
+            </script>              
+        </div>
+      </div>
+    </body>
+</html>
