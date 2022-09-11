@@ -1,5 +1,5 @@
 from re import template
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 import database.database_operations as db
 import services.read_xml as read_xml
 import threading
@@ -54,9 +54,13 @@ def login():
     if result[0] == True:
         current_user = result[1]
         print('current_user: ', current_user)
-        return render_template('news.html', data=read_xml.get_last_news())
+        return redirect('/news')
     else:
         return render_template('login.html')
+
+@app.route('/news')
+def news():
+    return render_template('news.html', data=db.get_news_paginated())
 
 @app.route("/to_register")
 def to_register():

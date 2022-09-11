@@ -15,7 +15,7 @@ def read_news():
             last_news.append({'title': entry.title, 'link': entry.link})
 
             # inserir noticia no banco de dados
-            db.insert_news(entry.title, entry.summary)
+            db.insert_news(entry.title, entry.summary, entry.link)
 
 def get_last_news():
     return last_news
