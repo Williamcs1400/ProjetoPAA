@@ -21,7 +21,7 @@ def word_count(str):
     
 def remove_stopwords(text):
     text_tokens = word_tokenize(text, language='portuguese')
-    tokens_without_sw = [word for word in text_tokens if not word in stopwords.words('portuguese')]
+    tokens_without_sw = [word for word in text_tokens if (not word in stopwords.words('portuguese') and len(word) > 2)]
     return " ".join(tokens_without_sw)
 
 def remove_numbers(text):
@@ -38,7 +38,6 @@ def remove_img(text):
 
 def to_lower_case(text):
     return text.lower()
-
 
 def suit_text(text):
     text = remove_img(text);
