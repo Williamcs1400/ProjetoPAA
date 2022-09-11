@@ -52,7 +52,8 @@ def create_tables():
             CREATE TABLE tags (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 news_id INTEGER,
-                tag TEXT
+                tag TEXT,
+                weight REAL
             );
         """)
         print("Tabela de tags criada com sucesso!")
@@ -74,16 +75,16 @@ def insert_news(title, content):
         # salvar tags
         cursor.execute("""SELECT id FROM news WHERE title = ?;""", (title,))
         news_id = cursor.fetchone()[0]
-        filtred = dictionary.suit_text(title + " " + content)
-        array_word_occurrence = dictionary.word_count(filtred)
-        insert_tags(news_id, array_word_occurrence)
+        filtered_text = dictionary.suit_text(title + " " + content)
+        tags_with_weight = dictionary.get_tags_weight(filtered_text)
+        insert_tags(news_id, tags_with_weight)
         
 
 def insert_tags(news_id, tags):
-    for tag in tags:
+    for tag, weight in tags.items():
         cursor.execute("""SELECT id FROM tags WHERE news_id = ? AND tag = ?;""", (news_id, tag))
         if cursor.fetchone() is None:
-            cursor.execute("""INSERT INTO tags (news_id, tag) VALUES (?, ?);""", (news_id, tag))
+            cursor.execute("""INSERT INTO tags (news_id, tag, weight) VALUES (?, ?, ?);""", (news_id, tag, weight))
             conn.commit()
 
 def insert_user(username, password):

@@ -1,4 +1,5 @@
 import nltk
+import math
 import re
 nltk.download("punkt")
 nltk.download("stopwords")
@@ -7,8 +8,8 @@ from nltk.tokenize import word_tokenize
 from string import digits, punctuation
 
 # contar a quatidade vezes que cada palavra aparece no texto
-def word_count(str):
-    counts = dict()
+def get_word_count(str):
+    counts = {}
     words = str.split()
 
     for word in words:
@@ -18,6 +19,31 @@ def word_count(str):
             counts[word] = 1
 
     return counts
+
+def get_word_frequency(word_count):
+    word_frequency = {}
+    
+    for word, count in word_count.items():
+        word_frequency[word] = math.sqrt(count)
+
+    return word_frequency
+
+def get_text_length_norm(text_length):
+    return 1 / math.sqrt(text_length)
+
+def get_tags_weight(text):
+    word_count = get_word_count(text)
+    word_frequency = get_word_frequency(word_count)
+
+    text_length = len(text)
+    text_length_norm = get_text_length_norm(text_length)
+
+
+    weight = {}
+    for word, frequency in word_frequency.items():
+        weight[word] = frequency * text_length_norm
+
+    return weight
     
 def remove_stopwords(text):
     text_tokens = word_tokenize(text, language='portuguese')
