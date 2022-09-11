@@ -75,7 +75,7 @@ def insert_news(title, content):
         cursor.execute("""SELECT id FROM news WHERE title = ?;""", (title,))
         news_id = cursor.fetchone()[0]
         filtred = dictionary.suit_text(title + " " + content)
-        array_word_occurrence = dictionary.word_count(filtred[0])
+        array_word_occurrence = dictionary.word_count(filtred)
         insert_tags(news_id, array_word_occurrence)
         
 

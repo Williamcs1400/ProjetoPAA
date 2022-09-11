@@ -1,5 +1,9 @@
 import nltk
+import re
+nltk.download("punkt")
+nltk.download("stopwords")
 from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 from string import digits, punctuation
 
 # contar a quatidade vezes que cada palavra aparece no texto
@@ -16,13 +20,9 @@ def word_count(str):
     return counts
     
 def remove_stopwords(text):
-    text = nltk.sent_tokenize(text)
-    
-    for i in range(len(text)):
-        words = nltk.word_tokenize(text[i])
-        newwords = [word for word in words if word not in stopwords.words('portuguese')]
-        text[i] = ' '.join(newwords)
-    return text
+    text_tokens = word_tokenize(text, language='portuguese')
+    tokens_without_sw = [word for word in text_tokens if not word in stopwords.words('portuguese')]
+    return " ".join(tokens_without_sw)
 
 def remove_numbers(text):
     remove_digits = str.maketrans('', '', digits)
@@ -33,11 +33,18 @@ def remove_punctuation(text):
 
 def remove_img(text):
     # as noticias sempre vem com a tag img, então vamos remover
-    text = text.replace('<img src="', '')
+    text = re.sub(r'<img.+\/>', "", text)
+    return text
+
+def to_lower_case(text):
+    return text.lower()
+
 
 def suit_text(text):
+    text = remove_img(text);
     text = remove_numbers(text)
     text = remove_punctuation(text)
+    text = to_lower_case(text)
     text = remove_stopwords(text)
     return text
     
