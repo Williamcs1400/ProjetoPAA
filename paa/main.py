@@ -27,7 +27,7 @@ def click_news():
     title = request.values.get('title')
     
     db.insert_preference(current_user, title)
-    return render_template('news.html', data=read_xml.get_last_news())
+    return render_template('news.html', data=db.get_news_paginated())
 
 @app.route('/register', methods=['POST'])
 def register():
