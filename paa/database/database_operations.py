@@ -124,8 +124,12 @@ def insert_preference(user_id, title):
     print("Preferência inserida com sucesso!")
 
 def get_news_paginated():
-    cursor.execute("""SELECT * FROM news order by id desc limit ? offset ?;""", (20, 0))
-    news = cursor.fetchall()
+    updated_conn = sqlite3.connect('database/feed.db', check_same_thread=False)
+    updated_conn.row_factory = sqlite3.Row
+    updated_cursor = conn.cursor()
+
+    updated_cursor.execute("""SELECT * FROM news order by id desc limit ? offset ?;""", (20, 0))
+    news = updated_cursor.fetchall()
 
     # print(news)
 
