@@ -2,6 +2,9 @@ from re import template
 from flask import Flask, render_template, request
 import database.database_operations as db
 import services.read_xml as read_xml
+import threading
+
+INTERVAL = 60                        # tempo de intervalo entre as chamadas leituras do feed
 
 app = Flask(__name__)
 
@@ -12,8 +15,7 @@ current_user = None
 def init_app():
     print('Iniciando aplicação...')
     db.create_tables()
-    db_connection = db.get_connection()
-    read_xml.read_news()
+    threading.Timer(INTERVAL, read_xml.read_news).start()    
 
 # pagina raiz
 @app.route('/')
