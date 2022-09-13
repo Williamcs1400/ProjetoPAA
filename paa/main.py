@@ -1,19 +1,20 @@
 from re import template
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, session
 import database.database_operations as db
 import services.read_xml as read_xml
+import threading
+
+INTERVAL = 60                        # tempo de intervalo entre as chamadas leituras do feed
 
 app = Flask(__name__)
-
+app.config['SECRET_KEY'] = 'super-secret'
 db_connection = None
-current_user = None
 
 # opreacoes iniciais do app
 def init_app():
     print('Iniciando aplicação...')
     db.create_tables()
-    db_connection = db.get_connection()
-    read_xml.read_news()
+    threading.Timer(INTERVAL, read_xml.read_news).start()    
 
 # pagina raiz
 @app.route('/')
@@ -24,8 +25,8 @@ def main():
 def click_news():
     title = request.values.get('title')
     
-    db.insert_preference(current_user, title)
-    return render_template('news.html', data=read_xml.get_last_news())
+    db.insert_preference(session['user_id'], title)
+    return render_template('news.html', data=db.get_news_paginated())
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -50,11 +51,18 @@ def login():
     result = db.compare_user(username,password)
 
     if result[0] == True:
-        current_user = result[1]
-        print('current_user: ', current_user)
-        return render_template('news.html', data=read_xml.get_last_news())
+        session['user_id'] = result[1]
+        print('current_user: ', session['user_id'])
+        return redirect('/news')
     else:
         return render_template('login.html')
+
+@app.route('/news')
+def news():
+    if not session['user_id']:
+        redirect("/")
+    else:
+        return render_template('news.html', data=db.get_news_paginated())
 
 @app.route("/to_register")
 def to_register():
