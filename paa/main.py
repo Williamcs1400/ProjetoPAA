@@ -3,6 +3,8 @@ from flask import Flask, render_template, request, redirect, session
 import database.database_operations as db
 import services.read_xml as read_xml
 import threading
+import services.security as security
+
 
 INTERVAL = 60                        # tempo de intervalo entre as chamadas leituras do feed
 
@@ -33,6 +35,7 @@ def register():
     name =  request.form['name_register']
     username = request.form['username_register']
     password = request.form['password_register']
+    password = security.hash_sha256(password)
 
     db.insert_user(username, password)
 
@@ -47,6 +50,7 @@ def login():
     # fazer login
     username = request.form['username_login']
     password = request.form['password_login']
+    password = security.hash_sha256(password)
 
     result = db.compare_user(username,password)
 
