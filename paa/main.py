@@ -2,8 +2,8 @@ from re import template
 from flask import Flask, render_template, request, redirect, session, flash
 import database.database_operations as db
 from services import read_xml
-from services import security
 import threading
+from services import security
 
 INTERVAL = 60                        # tempo de intervalo entre as chamadas leituras do feed
 
@@ -36,14 +36,10 @@ def register():
     username = request.form['username_register']
     password = request.form['password_register']
 
-    if name == '':
-        flash("Informe seu nome")
-    if username == '':
-        flash("Informe seu usuario")
-    if password == '':
-        flash("Informe sua senha")
-
-
+    if name == '' or username == '' or password == '':
+        flash("Informe os dados solicitados")
+        return redirect('/to_register')
+    
     password = security.hash_sha256(password)
 
     db.insert_user(username, password)
