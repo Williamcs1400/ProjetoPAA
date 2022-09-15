@@ -131,18 +131,20 @@ def compare_user(username, password):
 
 def insert_user_tags(user_id, tags):
 
-    for tag, count in tags.items():
-        print('Inserindo tag {} com contagem {} para usuário {}'.format(tag, count, user_id))
-
-        cursor.execute("""SELECT id FROM user_tags WHERE user_id = ? AND tag = ?;""", (user_id, tag))
+    for tag in tags:
+               
+        cursor.execute("""SELECT count FROM user_tags WHERE user_id = ? AND tag = ?;""", (user_id, tag))
+        count = cursor.fetchone()
 
         if cursor.fetchone() is None:
-            cursor.execute("""INSERT INTO user_tags (user_id, tag, count) VALUES (?, ?, ?);""", (user_id, tag, count))
+            print('Inserindo tag {} para usuário {}'.format(tag, user_id))
+            cursor.execute("""INSERT INTO user_tags (user_id, tag, count) VALUES (?, ?, ?);""", (user_id, tag, 1))
             conn.commit()
         else:
-            cursor.execute("""UPDATE user_tags SET count = ? WHERE user_id = ? AND tag = ?;""", (count, user_id, tag))
+            count = count['count']
+            print('Atualizando tag {} para usuário {} com count {}'.format(tag, user_id, count))
+            cursor.execute("""UPDATE user_tags SET count = ? WHERE user_id = ? AND tag = ?;""", (count+1, user_id, tag))
             conn.commit()
-
 
 
 
@@ -160,13 +162,17 @@ def insert_preference(user_id, title):
     tags = cursor.fetchall()
 
     # LISTA DE TAGS E RESPECTIVO PESO =>  [(tag1, peso1), (tag2, peso2), ...]
-    tags_list = [t['tag'] for t in tags]
-    weights_list = [round(t['weight'], 5) for t in tags]
-
+    tags_list = [t['tag'] for t in tags[:10]]
+    weights_list = [round(t['weight'], 5) for t in tags[:10]]
     tags = list(zip(tags_list, weights_list))
 
+    # ORDENA PELO PESO
     tags.sort(key=lambda x: x[1], reverse=True)
-    tags = tags[:10]
+    tags = [t[0] for t in tags]
+
+    # print(tags)
+
+    insert_user_tags(user_id, tags)
 
 
 def get_news_paginated():
