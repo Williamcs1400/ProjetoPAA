@@ -14,6 +14,9 @@
   padding: 45px;
   text-align: center;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .form input {
   font-family: "Roboto", sans-serif;
@@ -97,9 +100,23 @@ body {
   -moz-osx-font-smoothing: grayscale;      
 }
 .title_news{
-  font-size: 18px;
+  font-size: 1.3rem;
   color: rgb(92, 92, 206);
   text-align: center;
   margin-top: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.news-content {
+  color: #000000;
+  text-decoration: none;
+  font-size: 0.9rem;
+  text-align: justify;
+  margin: 5px;
+}
+
+.link {
+  text-decoration: none;
+  cursor:default;
 }

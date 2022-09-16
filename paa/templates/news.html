@@ -13,8 +13,12 @@
             <h1>Guia de notícias</h1>
             <ul>
             {% for item in data %}
-            <a target="_blank" rel="noopener noreferrer" href={{item.link}}>
-                <h3 class="title_news" onclick="click_new('{{item.title}}')">{{item.title}}</h3>
+            <a target="_blank" rel="noopener noreferrer" href={{item.link}} class="link">
+                <h3 class="title_news" onclick="click_new('{{item.title}}')">{{item.title}}</h3>     
+                <p class="news-content">    <!-- lorem ipsum só pra testar formatação-->
+                    {{item.content}}
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas varius, nisi a viverra fringilla, lacus nisl venenatis leo, id facilisis ante nulla eget tortor. Ut mollis felis sed nibh rhoncus gravida ut non leo. Egestas porta nulla suscipit quis. Vivamus ut magna nec lorem vehicula volutpat ac id urna.
+                </p>
             </a>
             {% endfor %}
             </ul>  
