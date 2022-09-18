@@ -60,6 +60,20 @@ def create_tables():
         """)
         print("Tabela de tags criada com sucesso!")
 
+
+    cursor.execute("""SELECT name FROM sqlite_master WHERE type='table' AND name='user_tags';""")
+    if cursor.fetchone() is None:
+        print("Criando tabela de tags de usuário...")
+        cursor.execute("""
+            CREATE TABLE user_tags (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                tag TEXT,
+                count INTEGER
+            );
+        """)
+        print("Tabela de tags de usuário criada com sucesso!")
+
 def get_connection():
     return conn
 
@@ -84,6 +98,7 @@ def insert_news(title, content, link):
 
 def insert_tags(news_id, tags):
     for tag, weight in tags.items():
+        print('Inserindo tag {} com peso {} para notícia {}'.format(tag, weight, news_id))
         cursor.execute("""SELECT id FROM tags WHERE news_id = ? AND tag = ?;""", (news_id, tag))
         if cursor.fetchone() is None:
             cursor.execute("""INSERT INTO tags (news_id, tag, weight) VALUES (?, ?, ?);""", (news_id, tag, weight))
@@ -114,6 +129,25 @@ def compare_user(username, password):
     else:
         return (True, str(result[0]))
 
+def insert_user_tags(user_id, tags):
+
+    for tag in tags:
+               
+        cursor.execute("""SELECT count FROM user_tags WHERE user_id = ? AND tag = ?;""", (user_id, tag))
+        count = cursor.fetchone()
+
+        if cursor.fetchone() is None:
+            print('Inserindo tag {} para usuário {}'.format(tag, user_id))
+            cursor.execute("""INSERT INTO user_tags (user_id, tag, count) VALUES (?, ?, ?);""", (user_id, tag, 1))
+            conn.commit()
+        else:
+            count = count['count']
+            print('Atualizando tag {} para usuário {} com count {}'.format(tag, user_id, count))
+            cursor.execute("""UPDATE user_tags SET count = ? WHERE user_id = ? AND tag = ?;""", (count+1, user_id, tag))
+            conn.commit()
+
+
+
 def insert_preference(user_id, title):
     cursor.execute("""SELECT id FROM news WHERE title = ?;""", (title,))
     news_id = cursor.fetchone()['id']
@@ -122,6 +156,24 @@ def insert_preference(user_id, title):
     cursor.execute("""INSERT INTO preferences (user_id, news_id) VALUES (?, ?);""", (user_id, news_id))
     conn.commit()
     print("Preferência inserida com sucesso!")
+    
+    # SELECIONA TODAS AS TAGS DA NOTÍCIA
+    cursor.execute("""SELECT news_id, tag, weight FROM tags WHERE news_id = ?;""", (str(news_id),))
+    tags = cursor.fetchall()
+
+    # LISTA DE TAGS E RESPECTIVO PESO =>  [(tag1, peso1), (tag2, peso2), ...]
+    tags_list = [t['tag'] for t in tags[:10]]
+    weights_list = [round(t['weight'], 5) for t in tags[:10]]
+    tags = list(zip(tags_list, weights_list))
+
+    # ORDENA PELO PESO
+    tags.sort(key=lambda x: x[1], reverse=True)
+    tags = [t[0] for t in tags]
+
+    # print(tags)
+
+    insert_user_tags(user_id, tags)
+
 
 def get_news_paginated():
     updated_conn = sqlite3.connect('database/feed.db', check_same_thread=False)
