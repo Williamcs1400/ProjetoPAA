@@ -5,7 +5,7 @@ from services import read_xml
 import threading
 from services import security
 
-INTERVAL = 60                        # tempo de intervalo entre as chamadas leituras do feed
+INTERVAL = 120                        # tempo de intervalo entre as chamadas leituras do feed
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'super-secret'
