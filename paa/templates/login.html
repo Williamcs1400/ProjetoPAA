@@ -8,6 +8,11 @@
     <body>
       <div class="login-page">
         <div class="form">
+          {% for message in get_flashed_messages() %}
+            <div class="alert alert-danger" role="alert">
+            {{ message }}
+            </div>
+          {% endfor %}
           <form class="login-form" action="/login" method="post">
             <input type="text" name="username_login" placeholder="Usuário"/>
             <input type="password" name="password_login" placeholder="Senha"/>
