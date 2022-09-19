@@ -198,16 +198,17 @@ def insert_preference(user_id, title):
     insert_user_tags(user_id, tags)
 
 
-def get_news_paginated(page=1):
+def get_news_paginated(user_id, page=1):
     updated_conn = sqlite3.connect('database/feed.db', check_same_thread=False)
     updated_conn.row_factory = sqlite3.Row
     updated_cursor = conn.cursor()
 
-    updated_cursor.execute(
-        """SELECT * FROM news order by id desc limit ? offset ?;""", (20, 20*(page-1)))
+    news_list = get_preferred_news(user_id, page, 20)
+    print(news_list)
+    updated_cursor.execute(news_list)
+    #updated_cursor.execute(
+    #    """SELECT * FROM news order by id desc limit ? offset ?;""", (20, 20*(page-1)))
     news = updated_cursor.fetchall()
-
-    # print(news)
 
     formated_news = []
     if news is not None:
@@ -216,3 +217,51 @@ def get_news_paginated(page=1):
                 {'title': item['title'], 'link': item['link'], 'content': item['content']})
 
     return formated_news
+
+
+def get_preferred_news(user_id, page, page_size):
+    cursor.execute("SELECT COUNT(id) FROM news;")
+    news_list_size = cursor.fetchone()[0]
+    news_list = [[0]*2 for _ in range(news_list_size)]
+
+    # Gera uma lista de noticias associadas a um peso de preferencia do usuario
+    for i in range(news_list_size):
+        news_list[i][0] = i+1
+        cursor.execute("SELECT tag,weight FROM tags WHERE news_id = ?;", [i+1])
+        tags = cursor.fetchall()
+        cursor.execute("SELECT tag,count FROM user_tags WHERE user_id = ?;", (user_id))
+        user_tags = cursor.fetchall()
+        for j in tags:
+            for k in user_tags:
+                if j[0] == k[0]:
+                    news_list[i][1] = news_list[i][1]+(j[1] * k[1])
+
+    # Ordena a lista com base no maior peso, e secundariamente com base nas noticias mais recentes
+    news_list.sort(key=lambda x:x[0], reverse=True)
+    news_list.sort(key=lambda x:x[1], reverse=True)
+
+    # Gera a string com a lista de noticias para o comando SQL
+    limits = check_page(page, page_size, news_list_size)
+
+    news_list_string = "SELECT * FROM news WHERE id IN ("
+    for i in range(limits[0],limits[1]):
+        news_list_string += str(news_list[i][0]) + ", "
+    news_list_string += str(news_list[limits[1]][0]) + ")"
+    #news_list_string += ";"
+
+    news_list_string += " ORDER BY CASE "
+    for i in range(limits[0],limits[1]):
+        news_list_string += "WHEN id = " + str(news_list[i][0]) + " THEN " + str(i) + " "
+    news_list_string += "WHEN id = " + str(news_list[limits[1]][0]) + " THEN " + str(limits[1]) + " END, id"
+    news_list_string += ";"
+
+    return news_list_string
+
+
+def check_page(page, page_size, news_list_size):
+    if (page-1)*page_size >= news_list_size:
+        return check_page(page-1, page_size, news_list_size)
+    elif page*page_size > news_list_size:
+        return [(page-1)*page_size if (page > 1) else 1, news_list_size-1]
+    else:
+        return [(page-1)*page_size if (page > 1) else 1, page*page_size-1]

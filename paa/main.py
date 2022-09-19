@@ -34,7 +34,7 @@ def click_news():
     title = request.values.get('title')
 
     db.insert_preference(session['user_id'], title)
-    return render_template('news.html', data=db.get_news_paginated())
+    return render_template('news.html', data=db.get_news_paginated(session['user_id']))
 
 
 @app.route('/register', methods=['POST'])
@@ -88,7 +88,7 @@ def news():
         return redirect("/")
     else:
         page = request.args.get('page', 1, type=int)
-        return render_template('news.html', data=db.get_news_paginated(page), page=page)
+        return render_template('news.html', data=db.get_news_paginated(session['user_id'], page), page=page)
 
 
 @app.route('/logout')
